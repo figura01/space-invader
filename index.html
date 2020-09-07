@@ -3,8 +3,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Space Invider</title>
-</head>
-<body>
+    <link rel="stylesheet" href="src/css/style.css">
     
+    <script src="index.js" type="module"></script>
+    <script src="src/js/game.js" type="module"></script>
+    
+</head>
+<body id="body" class="flex-col-center">
+    <div class="gradient-black"></div>
+    <header id="header" class="flex-h-center">
+        <h1 class="main-title">Welcome to <span class="logo-title">SPACE<br>INVIDER</span></h1>
+    </header>
+    <main id="main">
+        <div class="container">
+            <div id="panels">
+                <div id="panel-game" class="panel active flex-col-center ">
+                    <h3>Game Menu</h3>
+                    <ul>
+                        <li>
+                            <a id="btn-start" class="btn btn-start">Start New Game</a>
+                        </li>
+                        <li>
+                            <a id="btn-instruction" class="btn btn-instruction">Instruction</a>
+                        </li>
+                        <li class="level">
+                            <input class="radio"  type="radio" id="easy" name="difficulty" value="easy" checked>
+                            <label for="difficulty">Easy</label>
+                        </li>
+                        <li class="level">
+                            <input class="radio" type="radio" id="medium" name="difficulty" value="medium" >
+                            <label for="difficulty">Medium</label>
+                        </li>
+
+                        <li class="level">
+                            <input class="radio" type="radio" id="hard" name="difficulty" value="hard" >
+                            <label for="difficulty">Hard</label>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="panel-psedo" class="panel hidden flex-col-center ">
+                    <h3>Create Pseudo</h3>
+                    <input id="input-psedo" type="text" class="btn" />
+                    <button id="btn-validate" class="btn btn-validate">Valider</button>
+                    <button class="btn btn-back">Back</button>
+                </div>
+
+                <div id="panel-instruction" class="panel hidden flex-col-center ">
+                    <h3>Instruction</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus facere distinctio amet quo, inventore mollitia voluptates obcaecati dolores id reprehenderit, hic nihil ullam ab quaerat, earum odit. Quisquam, ipsa cupiditate.</p>
+                    <button class="btn btn-back">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </main>
+    <footer class="footer">
+        <p>Create by Laurent Vuillaume - 2020</p>
+    </footer>
 </body>
 </html>
