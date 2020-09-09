@@ -141,6 +141,10 @@ class ShipEnemie extends objElGame {
             posY: this.positionY
         };
     }
+
+    getShip() {
+        return this;
+    }
 }
 
 class Laser extends objElGame {
@@ -181,9 +185,11 @@ const actionEnnemies = () => {
         for(let i=0; i < gameObject.arrEnemies.length; i++) {
             if(gameObject.arrEnemies[i].positionX == player.positionX) {
                 //gameObject.arrEnemies[i].shoot();
-                let enemieShipPositions = gameObject.arrEnemies[i].getPosition();
-                createEnemiesLasers(enemieShipPositions);
-                gameObject.stopLoopGame();
+                //let enemieShipPositions = gameObject.arrEnemies[i].getPosition();
+                let enemieShip = gameObject.arrEnemies[i];
+                console.log(enemieShip);           
+                createEnemiesLasers(enemieShip);
+                //gameObject.stopLoopGame();
             }
         }
     }
@@ -297,27 +303,32 @@ const createLaser = () => {
     return el;
 };
 
-const createEnemiesLasers = (enemiePos) => {
-    console.log(enemiePos);
+const createEnemiesLasers = (enemieShip) => {
+    console.log(enemieShip);
     let indexTab;
     if(gameObject.arrBulletsEnemies.length == 0) {
         indexTab = 0;
     } else {
         indexTab = gameObject.arrBulletsEnemies.length;
     }
-    let laserN = new Laser(enemiePos.posX, enemiePos.posY);
+    let laserN = new Laser(enemieShip.positionX + (enemieShip.width/2) -3, enemieShip.positionY + enemieShip.height ) ;
 
     let laserId = 'laser-enemie-'+indexTab;
     let laserNdom = createElementDom('img', laserId );
     laserNdom.src ='./src/images/laser-green-11.png';
     laserNdom.style.position = 'absolute';
-    laserNdom.style.rotate = 180;
-    laserNdom.style.top = enemiePos.posY;
-    laserNdom.style.left = enemiePos.posX;
+    laserNdom.style.transformOrigin = 'center';
+    laserNdom.style.transform = 'rotate(180deg)';
+    laserNdom.style.width = laserN.width;
+    laserNdom.style.height = laserN.height;
+    laserNdom.style.top = laserN.positionY;
+    laserNdom.style.left = laserN.positionX;
 
+    console.log('laserDomN X: ', laserNdom.style.left + 'laser X: ', laserN.positionX);
     elMain.appendChild(laserNdom);
     laserN.ref = document.getElementById(laserNdom.id);
-
+    laserN.refId = laserNdom.id;
+    console.log(laserNdom)
     gameObject.arrBulletsEnemies.push(laserN);
 }
 
