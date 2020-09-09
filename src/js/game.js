@@ -162,17 +162,25 @@ class Laser extends objElGame {
     moveToTop() {
         this.positionY -= 5;
     }
+
+    moveToBottom() {
+        this.positionY += 5;
+    }
 }
 
 /*********CONST GAME *********/
 var elMain = document.getElementById('main').childNodes[1];
+console.log(elMain)
 var gameObject = new Game('easy');
 console.log(gameObject);
+
+var mainScreenById;
 
 var testObj = new objElGame(100, 200, 40, 30);
 console.log(testObj.getPosition());
 
 var player = new ShipPlayer((gameObject.width / 2), (gameObject.height - 50), 40, 30);
+
 /*****************************/
 
 const updateValue = () => {
@@ -187,8 +195,11 @@ const actionEnnemies = () => {
                 //gameObject.arrEnemies[i].shoot();
                 //let enemieShipPositions = gameObject.arrEnemies[i].getPosition();
                 let enemieShip = gameObject.arrEnemies[i];
-                console.log(enemieShip);           
-                createEnemiesLasers(enemieShip);
+                console.log(enemieShip);
+                setTimeout(function(){
+                    createEnemiesLasers(enemieShip);
+                }, 500);           
+                
                 //gameObject.stopLoopGame();
             }
         }
@@ -221,6 +232,18 @@ const renderElements = () => {
             }
         }
     }
+
+    if (gameObject.arrBulletsEnemies.length != 0) {
+        let lasersN = document.querySelectorAll('.laser-enemie');
+        for(let j = 0; j < gameObject.arrBulletsEnemies.length; j++) {
+            console.log(gameObject.arrBulletsEnemies[j]);
+            gameObject.arrBulletsEnemies[j].moveToBottom();
+            lasersN[j].style.top = gameObject.arrBulletsEnemies[j].positionY;
+
+        }
+        //gameObject.stopLoopGame();
+    }
+
 }
 
 const createElementDom = (elType, idName) => {
@@ -258,7 +281,7 @@ const createEnnemies = () => {
         elShip.style.top = ship.positionY;
         elShip.style.left = ship.positionX;
         gameObject.arrEnemies.push(ship);
-        insertElementInDom(elMain, elShip);
+        insertElementInDom(mainScreenById, elShip);
         ship.refId = document.getElementById(elShip.id);
         initX += ship.width + 20;
     };
@@ -272,7 +295,7 @@ const createPlayer = () => {
     elImg.style.transformOrigin = 'center';
     elImg.style.top = player.positionY;
     elImg.style.left = player.positionX;
-    insertElementInDom(elMain, elImg);
+    insertElementInDom(mainScreenById, elImg);
     player.ref = document.getElementById(elImg.id);
 }
 
@@ -298,7 +321,7 @@ const createLaser = () => {
     elDom.style.left = el.positionX;
     elDom.style.top = el.positionY;
     elDom.style.opacity = 1;
-    elMain.appendChild(elDom);
+    mainScreenById.appendChild(elDom);
     el.ref = document.getElementById(elDom.id);
     return el;
 };
@@ -316,6 +339,7 @@ const createEnemiesLasers = (enemieShip) => {
     let laserId = 'laser-enemie-'+indexTab;
     let laserNdom = createElementDom('img', laserId );
     laserNdom.src ='./src/images/laser-green-11.png';
+    laserNdom.classList.add('laser-enemie');
     laserNdom.style.position = 'absolute';
     laserNdom.style.transformOrigin = 'center';
     laserNdom.style.transform = 'rotate(180deg)';
@@ -325,7 +349,7 @@ const createEnemiesLasers = (enemieShip) => {
     laserNdom.style.left = laserN.positionX;
 
     console.log('laserDomN X: ', laserNdom.style.left + 'laser X: ', laserN.positionX);
-    elMain.appendChild(laserNdom);
+    mainScreenById.appendChild(laserNdom);
     laserN.ref = document.getElementById(laserNdom.id);
     laserN.refId = laserNdom.id;
     console.log(laserNdom)
@@ -386,6 +410,7 @@ const gameInit = () => {
     const mainScreen = createElementDom('div', 'main-screen');
     createMainScreenGame(mainScreen);
     insertElementInDom(elMain, mainScreen);
+    mainScreenById = document.getElementById('main-screen');
     createPlayer();
     createEnnemies();
     gameObject.startLoopGame();
