@@ -632,45 +632,7 @@ const createLaser = (src, indexLaser) => {
     return el;
 };
 
-/*
-const createEnemiesLasers = (enemieShip) => {
-    //console.log(enemieShip);
-    let indexTab;
-    if (gameObject.arrBulletsEnemies.length == 0) {
-        indexTab = 0;
-    } else {
-        indexTab = gameObject.arrBulletsEnemies.length;
-    }
-    let imgSrc = './src/images/laser-green-11.png';
-    let laserN = new Laser(enemieShip.positionX + (enemieShip.width / 2) - 3, enemieShip.positionY + enemieShip.height, 'n', imgSrc);
-
-    let laserId = 'laser-enemie-' + indexTab;
-    let laserNdom = createElementDom('img', laserId);
-    laserNdom.src = laserN.imgSrc
-    laserNdom.classList.add('laser-enemie');
-    laserNdom.style.position = 'absolute';
-    laserNdom.style.transformOrigin = 'center';
-    laserNdom.style.transform = 'rotate(180deg)';
-    laserNdom.style.width = laserN.width;
-    laserNdom.style.height = laserN.height;
-    laserNdom.style.top = laserN.positionY;
-    laserNdom.style.left = laserN.positionX;
-
-    //console.log('laserDomN X: ', laserNdom.style.left + 'laser X: ', laserN.positionX);
-    mainScreenById.appendChild(laserNdom);
-    laserN.ref = document.getElementById(laserNdom.id);
-    laserN.refId = laserNdom.id;
-    //console.log(laserNdom)
-    gameObject.arrBulletsEnemies.push(laserN);
-    console.log(gameObject.arrBulletsEnemies)
-    return laserDom;
-}
-*/
-
-
 const ckeckColision = () => {
-    //console.log('checkColision');
-    // check laser on ennemie
 
     if (gameObject.arrBulletsPlayers.length != 0 && gameObject.arrEnemies.length != 0) {
         for (let i = 0; i < gameObject.arrBulletsPlayers.length; i++) {
@@ -681,11 +643,6 @@ const ckeckColision = () => {
                     gameObject.arrBulletsPlayers[i].positionY <= gameObject.arrEnemies[j].positionY + gameObject.arrEnemies[j].height &&
                     gameObject.arrBulletsPlayers[i].positionX >= gameObject.arrEnemies[j].positionX &&
                     gameObject.arrBulletsPlayers[i].positionX <= gameObject.arrEnemies[j].positionX + gameObject.arrEnemies[j].width) {
-
-
-
-                    //console.log(gameObject.score);
-
 
                     let enemie = gameObject.arrEnemies[j];
                     let enemieId = gameObject.arrEnemies[j].ref;
@@ -705,27 +662,9 @@ const ckeckColision = () => {
                         gameObject.stopLoopGame();
                         gameObject.resetLoopGame();
                     }
-                    // let laser = gameObject.arrBulletsPlayers[i];
-                    // let laserId = gameObject.arrBulletsPlayers[i].refId;
-                    // let laserRef = gameObject.arrBulletsPlayers[i].ref;
-
-                    //laserRef.remove();
-                    //gameObject.arrBulletsPlayers.splice(i, 1);
-
                 }
             }
-            /*
-            gameObject.arrBulletsPlayers
-            let elmentsToRemove = gameObject.arrBulletsPlayers.filter((bullet) => { bullet.isCollised === true})
-            console.log('#####################',elmentsToRemove);
-            if(elmentsToRemove.length != 0) {
-                console.log('#####################',elmentsToRemove);
-                gameObject.stopLoopGame();
-            }
-            */
-
         }
-
     }
 
     if (gameObject.arrBulletsEnemies.length != 0) {
@@ -735,64 +674,45 @@ const ckeckColision = () => {
             if (gameObject.arrBulletsEnemies[d].positionY >= (player.positionY - player.height) + (gameObject.arrBulletsEnemies[d].height / 2) &&
                 gameObject.arrBulletsEnemies[d].positionX >= player.positionX &&
                 gameObject.arrBulletsEnemies[d].positionX <= player.positionX + player.width) {
-                // console.log('----------------------------------');
-                // console.log(player.positionX, gameObject.arrBulletsEnemies[d].positionX)
-                // console.log('colision laser enemie width player');
-                // console.log('----------------------------------');
-                //gameObject.arrBulletsEnemies[d].isCollised = true;
-                //gameObject.arrBulletsEnemies[d].ref.style.display = 'none';
-                //gameObject.arrBulletsEnemies[d].ref.classList.add('enemybullet', 'toremove');
-
-                //bulletsToRemove.push(gameObject.arrBulletsEnemies[d])
-                //console.log(indexOfEl = gameObject.arrBulletsEnemies.indexOf(gameObject.arrBulletsEnemies[d]))
-                //indexOfEl = gameObject.arrBulletsEnemies.indexOf(gameObject.arrBulletsEnemies[d]);
-                //bulletsToRemove.push(indexOfEl);
 
                 gameObject.nbrLife -= 1;
                 if (gameObject.nbrLife < 0) {
                     gameObject.gameIsOver = true;
                     //console.log(divMessagePanel);
                     divMessagePanel.innerHTML = createMessagePanel('lose');
-                    
+
                     divMessagePanel.classList.add('show');
                     btnReload = document.getElementById('btn-reload');
-                    btnReload.addEventListener('click', fctRealodPage)
+                    btnReload.addEventListener('click', fctRealodPage);
                     gameObject.stopLoopGame();
                     gameObject.resetLoopGame();
 
                 }
-            
-
-            //gameObject.stopLoopGame();
+            }
         }
-        //console.log('----------------------------------');
-        //console.log(bulletsToRemove);
-        //console.log('----------------------------------');
 
+        if (gameObject.arrEnemies.length == 0) {
+
+        }
+    };
+
+    const fctRealodPage = (evt) => {
+        evt.preventDefault();
+        window.location.reload();
     }
 
-    if (gameObject.arrEnemies.length == 0) {
-        //gameObject.stopLoopGame;
-        //console.log('------ Level Complite ------')
+    const createMessagePanel = (type) => {
+        var el;
+
+        if (type == 'lose') {
+            el = `<h3>GAME OVER !</h3><p>You lose ! You have lost all your life</p><button id="btn-reload" type="button" class="btn">Try again ?</button>`;
+        } else {
+            el = `<h3>VICTORY !</h3><p>You won ! You have killed all aliens bfore they destroy the earth</p><button id="btn-next" type="button" class="btn">Go next level</button>`;
+        }
+
+        return el;
     }
 };
-
-const fctRealodPage = (evt) => {
-    evt.preventDefault();
-    window.location.reload();
-}
-
-const createMessagePanel = (type) => {
-    var el;
-
-    if (type == 'lose') {
-        el = `<h3>GAME OVER !</h3><p>You lose ! You have lost all your life</p><button id="btn-reload" type="button" class="btn">Try again ?</button>`;
-    } else {
-        el = `<h3>VICTORY !</h3><p>You won ! You have killed all aliens bfore they destroy the earth</p><button id="btn-next" type="button" class="btn">Go next level</button>`;
-    }
-
-    return el;
-}
 
 /************* GAME INIT ***********/
 const gameInit = () => {
@@ -801,23 +721,23 @@ const gameInit = () => {
     header.classList.remove('header-intro');
     header.classList.add('header-game');
     header.innerHTML = `<div class="flex-h-between">
-        <div id="zone-player">
-            <h3 class="title-menu">PLAYER: </h3>
-            <p class="text flex-left"><span class="nbr-life">${gameObject.nbrLife}</span> X <img class="img-life" src="./src/images/player-orange-2.png"></p>
-        </div>
-        <div id="zone-time">
-            <h3 class="title-menu">TIME</h3>
-            <p class="text">${gameObject.time}</p>
-        </div>
-        <div id="zone-score">
-            <h3 class="title-menu">SCORE</h3>
-            <p class="text">${gameObject.score}</p>
-        </div></div>`;
+    <div id="zone-player">
+        <h3 class="title-menu">PLAYER: </h3>
+        <p class="text flex-left"><span class="nbr-life">${gameObject.nbrLife}</span> X <img class="img-life" src="./src/images/player-orange-2.png"></p>
+    </div>
+    <div id="zone-time">
+        <h3 class="title-menu">TIME</h3>
+        <p class="text">${gameObject.time}</p>
+    </div>
+    <div id="zone-score">
+        <h3 class="title-menu">SCORE</h3>
+        <p class="text">${gameObject.score}</p>
+    </div></div>`;
     document.getElementById('panels').style.display = 'none';
 
     let messagePanel = document.createElement('div');
     messagePanel.id = 'panel-message';
-    messagePanel.classList.add('panel')
+    messagePanel.classList.add('panel');
     messagePanel.innerHTML = '';
 
     const mainScreen = createElementDom('div', 'main-screen');
@@ -836,9 +756,6 @@ const gameInit = () => {
 };
 
 const listnerKeybord = (evt) => {
-    //console.log(evt.keyCode);
-    /* yop:38 bottom: 40,  left: 37, right: 39, spacebar: 32*/
-
     switch (evt.keyCode) {
         case 38: {
             player.moveToTop();
@@ -871,8 +788,6 @@ const listnerKeybord = (evt) => {
     //console.log(player);
 };
 
-
-
 window.addEventListener('keydown', listnerKeybord);
 
-gameInit()
+gameInit();
