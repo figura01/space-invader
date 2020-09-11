@@ -14,9 +14,12 @@ class Game {
         this.gameIsOver = false;
         this.score = 0;
         this.time = 0;
+        this.lastTime = new Date().setMinutes(3);
         this.nbrEnemies = 12 * this.level;
 
         this.intervalId = 0;
+
+        difficulty === "easy" ? this.nbrLife = 5 : difficulty === "medium" ? this.nbrLife = 4 : this.nbrLife = 3;
 
     }
 
@@ -31,6 +34,10 @@ class Game {
 
     stopLoopGame() {
         clearInterval(this.intervalId);
+    }
+
+    resetLoopGame() {
+        this.intervalId = 0;
     }
 };
 
@@ -55,10 +62,12 @@ class ShipPlayer extends objElGame {
     constructor(posX, posY, width, height) {
         super(posX, posY, width, height);
 
+        /*
         this.positionX = posX;
         this.positionY = posY;
         this.width = width;
         this.height = height;
+        */
         this.hp = 100;
         this.ref = '';
         this.imgSrc = './src/images/player-orange-2.png';
@@ -99,22 +108,25 @@ class ShipPlayer extends objElGame {
 class ShipEnemie extends objElGame {
     constructor(posX, posY, width, height) {
         super(posX, posY, width, height);
-
-        this.positionX = posX;
-        this.positionY = posY;
-        this.width = width;
-        this.height = height;
+        this.isBlocked = false;
+        this.haveMove = false;
         this.imgSrc = './src/images/enemy-black-1.png';
         this.refId = '';
         this.points = 100;
+        this.index = gameObject.arrEnemies.push(this) -1;
 
         this.isCollised = false;
     }
 
     moveToBottom() {
+        if (this.haveMove) return;
         if (this.positionY != gameObject.height - 50) {
             this.positionY += 5;
         }
+        this.haveMove = true;
+        setTimeout(() => {
+            this.haveMove = false;
+        }, 2000);
     }
 
     moveToLeft() {
@@ -130,9 +142,37 @@ class ShipEnemie extends objElGame {
     }
 
     shoot() {
-        console.log('ennemie shoot');
+        if (this.isBlocked) return;
+        let indexTab;
+        if (gameObject.arrBulletsEnemies.length == 0) {
+            indexTab = 0;
+        } else {
+            indexTab = gameObject.arrBulletsEnemies.length;
+        }
+        let laserN = new Laser(this.positionX + (this.width / 2) - 3, this.positionY + this.height, 'n', this.index);
         
-        //createEnemiesLasers();
+        /*
+        let laserId = 'laser-enemie-' + indexTab;
+        let laserNdom = createElementDom('img', laserId);
+        laserNdom.src = './src/images/laser-green-11.png';
+        laserNdom.classList.add('laser-enemie');
+        laserNdom.style.position = 'absolute';
+        laserNdom.style.transformOrigin = 'center';
+        laserNdom.style.transform = 'rotate(180deg)';
+        laserNdom.style.width = laserN.width;
+        laserNdom.style.height = laserN.height;
+        laserNdom.style.top = laserN.positionY;
+        laserNdom.style.left = laserN.positionX;
+        mainScreenById.appendChild(laserNdom);
+        laserN.ref = document.getElementById(laserNdom.id);
+        laserN.refId = laserNdom.id;
+        gameObject.arrBulletsEnemies.push(laserN);
+        */
+        this.isBlocked = true;
+        setTimeout(() => {
+            this.isBlocked = false;
+        }, 500);
+        
     }
 
     getPosition() {
@@ -145,103 +185,358 @@ class ShipEnemie extends objElGame {
     getShip() {
         return this;
     }
+
+    destroy() {
+        console.log(this);
+        //gameObject.arrEnemies.splice(this.index, 1);
+        
+        if(this.isCollised === true){
+            //this.gameObject.score += this.points; 
+            //this.isCollised = true;
+            
+            //gameObject.arrEnemies.splice(this.index, 1);
+            this.ref.remove();
+        }
+        
+        
+        //gameObject.stopLoopGame();
+    }
 }
 
+
 class Laser extends objElGame {
-    constructor(posX, posY) {
+    constructor(posX, posY, type, imgSrc, propLaser) {
         super(posX, posY);
-        this.positionX = posX;
-        this.positionY = posY;
         this.width = 6;
         this.height = 20;
         this.refId = '';
         this.ref = '';
-        this.imgSrc = './src/images/laser-blue-1.png';
+        this.type = type;
+        this.isToofar = false;
+        this.index = this.type === 'p' ? 
+            'player' :
+            propLaser;
+
+        //this.frameId = requestAnimationFrame(this.checkCollision);
+        this.imgSrc = this.type === 'p' ?
+            "./src/images/laser-blue-1.png" :
+            "./src/images/laser-green-11.png";
+        this.index = this.type === 'p' ?
+            gameObject.arrBulletsPlayers.push(this) - 1 :
+            gameObject.arrBulletsEnemies.push(this) - 1;
+
+        this.element = this.type === "p" ? this.createElementDomP() : this.createElementDomN();
+        //this.element = this.type === "n" ? this.createElementDomN() : null;
+        
+    }
+
+    createElementDomP() {
+        
+        const elDom = document.createElement('img');
+        elDom.style.opacity = 0;
+        // elDom.src = el.imgSrc;
+        elDom.src = this.imgSrc;
+        elDom.id = 'laser-' + this.index;
+        //el.refId = elDom.id; 
+        elDom.classList.add('laser-player');
+       
+        elDom.style.position = 'absolute';
+        elDom.style.transformOrigin = 'center';
+
+        elDom.style.width = this.width;
+        elDom.style.height = this.height;
+        elDom.style.left = this.positionX;
+        elDom.style.top = this.positionY;
+        elDom.style.opacity = 1;
+        
+        return mainScreenById.appendChild(elDom);
+        
+    }
+
+    createElementDomN() {
+        
+        const elDom = document.createElement('img');
+        elDom.style.opacity = 0;
+        elDom.src = this.imgSrc;
+        elDom.id = 'laser-' + this.index;
+        elDom.classList.add('laser-enemie');
+        elDom.style.position = 'absolute';
+        elDom.style.transformOrigin = 'center';
+        elDom.style.transform = 'rotate(180deg)';
+
+        elDom.style.width = this.width;
+        elDom.style.height = this.height;
+        elDom.style.left = this.positionX;
+        elDom.style.top = this.positionY;
+        elDom.style.opacity = 1;
+        return mainScreenById.appendChild(elDom);
+    }
+
+    checkCollision = () => {
+        //console.log("tick"
+        /*
+        gameObject.stopLoopGame();
+        */
+        if (this.isToofar) {
+            this.destroy();
+        }
+        if (this.type == 'n') {
+
+
+            if( 
+                this.positionX < player.positionX + player.width &&
+                this.positionX + this.positionX > player.positionX &&
+                this.positionY < player.positionY + player.height &&
+                this.height + this.positionY > player.positionY &&
+                this.isCollised === false
+                
+                // this.positionY + (this.height/2) > player.positionY - (player.height/2)
+                // && this.positionY - (this.height/2) < gameObject.height
+                // && this.positionX > player.positionX - (player.width/2)
+                // && this.positionX < player.positionX + (player.width/2)
+            ){
+                
+                this.isCollised = true;
+                this.element.remove();
+                gameObject.nbrLife -= 1;
+                console.log(gameObject.nbrLife);
+                if(gameObject.nbrLife < 0) {
+                    divPanelEnd.innerHTML = `<h3>GAME OVER !</h3><p>You lose ! You have lost all your life</p><button id="btn-reload" type="button" class="btn">Try again ?</button>`
+                    const btnReload = document.addEventListener('click', fctReloadPage);
+                    divPanelEnd.classList.add('show');
+                    gameObject.stopLoopGame();
+                    gameObject.resetLoopGame();
+                    window.location.reload
+                    //gameInit();
+                }
+            }
+
+            /*
+            gameObject.stopLoopGame();
+            */
+
+        } else {
+            console.log('player colision');
+            console.log(this);
+            /*
+            rect1.x < rect2.x + rect2.width &&
+            rect1.x + rect1.width > rect2.x &&
+            rect1.y < rect2.y + rect2.height &&
+            rect1.height + rect1.y > rect2.y
+            */
+            /*
+            if(
+                gameObject.arrBulletsPlayers[i].positionY <= gameObject.arrEnemies[j].positionY + gameObject.arrEnemies[j].height &&
+                    gameObject.arrBulletsPlayers[i].positionX >= gameObject.arrEnemies[j].positionX &&
+                    gameObject.arrBulletsPlayers[i].positionX <= gameObject.arrEnemies[j].positionX + gameObject.arrEnemies[j].width)
+                {}
+            gameObject.stopLoopGame();
+            */
+        }
+        requestAnimationFrame(this.checkCollision);   
+        
     }
 
     moveToTop() {
-        this.positionY -= 5;
+        //console.log('in moveTo', this, +' ' + this.type)
+        if(this.positionY < 0 && this.type === 'p') {
+            this.element.style.display = 'none';
+            this.isToofar = true;
+            //this.destroy();
+        } else {
+            this.positionY -= 5; 
+           
+        }
+        
+        
+        
+        //this.checkCollision();
+        //gameObject.stopLoopGame();
     }
 
     moveToBottom() {
-        this.positionY += 5;
+
+        if(this.positionY > gameObject.height && this.type === 'n') {
+            this.element.style.display = 'none';
+            this.isToofar = true;
+
+            //this.destroy();
+        } else {
+            this.positionY += 5;
+        }
+      
+        this.checkCollision();
+        
+        
+        //this.checkCollision();
+        //if ("check pos vs container");
+    }
+
+    destroy() {
+        // delete dqns le tablo avec son index
+        if (this.type == 'n') {
+            //console.log(this.index);
+            //gameObject.arrBulletsEnemies.splice(this.index, 1);
+            
+            // delete du doc    
+
+        } else {
+            //console.log(this.index);
+            //gameObject.arrBulletsPlayers.splice(this.index, 1);
+            // delete du docu
+
+        }
+        this.element.remove();
+        cancelAnimationFrame(this.frameId);
+    }
+
+    render() {
+        //console.log(this.ref);
+
+        
+        if(this.type == 'p') {
+
+            this.element.style.top = this.positionY;
+            //gameObject.stopLoopGame();
+        } else {
+
+            this.element.style.top = this.positionY;
+            
+            //gameObject.stopLoopGame();
+        }
+       
+        
     }
 }
 
 /*********CONST GAME *********/
 var elMain = document.getElementById('main').childNodes[1];
-console.log(elMain)
+//console.log(elMain)
 var gameObject = new Game('easy');
-console.log(gameObject);
+//console.log(gameObject);
 
 var mainScreenById;
-
-var testObj = new objElGame(100, 200, 40, 30);
-console.log(testObj.getPosition());
+var divPanelEnd;
 
 var player = new ShipPlayer((gameObject.width / 2), (gameObject.height - 50), 40, 30);
 
 /*****************************/
 
 const updateValue = () => {
+    let lifes = gameObject.nbrLife;
+    let lifesDom = document.querySelector('#zone-player .nbr-life');
+    lifesDom.innerHTML = `${lifes}`;
 
+    let score = gameObject.score;
+    let scoreDom = document.querySelector('#zone-score .text');
+    scoreDom.innerHTML = `${score}`;
+    /******************************/
+    /*
+    console.log('gameObject.lastTime',gameObject.lastTime);
+
+    const timeStart = gameObject.lastTime;
+    console.log(timeStart);
+    const timeStartSec = timeStart.getSeconds();
+    const timeStartMin = timeStart.getMinutes();
+    const time2 = new Date();
+    //time2.setMinutes(5);
+    
+    let time2Min = time2.getMinutes();
+    let time2Sec = time2.getSeconds();
+
+    console.log('time2', timeStartMin - time2Min, timeStartSec -time2Sec);
+    */
 }
 
 const actionEnnemies = () => {
-    console.log('actions ennemies')
+    //console.log('actions ennemies');
     if (gameObject.arrEnemies.length != 0) {
-        for(let i=0; i < gameObject.arrEnemies.length; i++) {
-            if(gameObject.arrEnemies[i].positionX == player.positionX) {
+        for (let i = 0; i < gameObject.arrEnemies.length; i++) {
+            var enemieShip = gameObject.arrEnemies[i];
+            if (gameObject.arrEnemies[i].positionX == player.positionX) {
                 //gameObject.arrEnemies[i].shoot();
                 //let enemieShipPositions = gameObject.arrEnemies[i].getPosition();
-                let enemieShip = gameObject.arrEnemies[i];
-                console.log(enemieShip);
-                setTimeout(function(){
-                    createEnemiesLasers(enemieShip);
-                }, 500);           
-                
+                let indexTab = gameObject.arrEnemies.indexOf(gameObject.arrEnemies[i])
+                console.log(indexTab)
+                //console.log(enemieShip);
+                enemieShip.shoot();
+
+                //createEnemiesLasers(enemieShip);
+
+
                 //gameObject.stopLoopGame();
             }
+            enemieShip.moveToBottom();
+
         }
     }
 }
 
 const renderElements = () => {
     const playerDom = player.ref;
-    console.log(player.ref);
-    console.log(player.getPosition());
+    //console.log(player.ref);
+    //console.log(player.getPosition());
 
     let playerPosition = player.getPosition();
     playerDom.style.left = playerPosition.posX;
     playerDom.style.top = playerPosition.posY;
-    console.log(playerDom.style.left);
+    //console.log(playerDom.style.left);
 
 
     if (gameObject.arrBulletsPlayers) {
-        let lasers = document.querySelectorAll('.laser-player');
-        console.log('render laser');
+
+        //console.log(gameObject.arrBulletsPlayers);
         for (let i = 0; i < gameObject.arrBulletsPlayers.length; i++) {
-            gameObject.arrBulletsPlayers[i].moveToTop();
+            
+                gameObject.arrBulletsPlayers[i].moveToTop();
+                gameObject.arrBulletsPlayers[i].render();
+            
+            /*
             lasers[i].style.top = gameObject.arrBulletsPlayers[i].positionY;
-            console.log(gameObject.arrBulletsPlayers[i].positionY);
+            //console.log(gameObject.arrBulletsPlayers[i].positionY);
             if (gameObject.arrBulletsPlayers[i].positionY < 0) {
-                let elDom= document.getElementById(gameObject.arrBulletsPlayers[i].refId);
-                elDom.remove();
-                gameObject.arrBulletsPlayers.splice(i, 1);
+                let elDom = document.getElementById(gameObject.arrBulletsPlayers[i].refId);
+                //elDom.remove();
+                //gameObject.arrBulletsPlayers.splice(i, 1);
 
             }
+            */
         }
+        gameObject.arrBulletsPlayers = gameObject.arrBulletsPlayers.filter(e => !e.isToofar);
+
     }
 
     if (gameObject.arrBulletsEnemies.length != 0) {
-        let lasersN = document.querySelectorAll('.laser-enemie');
-        for(let j = 0; j < gameObject.arrBulletsEnemies.length; j++) {
-            console.log(gameObject.arrBulletsEnemies[j]);
-            gameObject.arrBulletsEnemies[j].moveToBottom();
-            lasersN[j].style.top = gameObject.arrBulletsEnemies[j].positionY;
 
+        for (let j = 0; j < gameObject.arrBulletsEnemies.length; j++) {
+            //console.log(gameObject.arrBulletsEnemies[j]);
+            
+            gameObject.arrBulletsEnemies[j].moveToBottom();
+            gameObject.arrBulletsEnemies[j].render();
+            
+            
+            /*
+            lasersN[j].style.top = gameObject.arrBulletsEnemies[j].positionY;
+            if (gameObject.arrBulletsEnemies[j].positionY > gameObject.height + (gameObject.arrBulletsEnemies[j].height)) {
+                //console.log(gameObject.arrBulletsEnemies[j].positionY);
+                let laserDomN = document.getElementById(gameObject.arrBulletsEnemies[j].refId);
+                laserDomN.remove();
+                gameObject.arrBulletsEnemies.splice(j, 1);
+                //gameObject.stopLoopGame();
+            }
+            */
         }
+        gameObject.arrBulletsEnemies = gameObject.arrBulletsEnemies.filter(e => !e.isToofar);
         //gameObject.stopLoopGame();
+    }
+
+    if (gameObject.arrEnemies.length != 0) {
+        for (let k = 0; k < gameObject.arrEnemies.length; k++) {
+            const shipDom = gameObject.arrEnemies[k].ref;
+            //console.log(shipDom);
+            shipDom.style.top = gameObject.arrEnemies[k].positionY;
+        }
+        gameObject.arrEnemies = gameObject.arrEnemies.filter(e => !e.isCollised);
     }
 
 }
@@ -280,9 +575,10 @@ const createEnnemies = () => {
 
         elShip.style.top = ship.positionY;
         elShip.style.left = ship.positionX;
-        gameObject.arrEnemies.push(ship);
+        //gameObject.arrEnemies.push(ship);
         insertElementInDom(mainScreenById, elShip);
-        ship.refId = document.getElementById(elShip.id);
+        ship.ref = document.getElementById(elShip.id);
+        ship.refId = elShip.id;
         initX += ship.width + 20;
     };
 };
@@ -299,19 +595,27 @@ const createPlayer = () => {
     player.ref = document.getElementById(elImg.id);
 }
 
-const createLaser = () => {
+const fctReloadPage = (evt) => {
+    evt.preventDefault();
+    window.location.reload();
+}
+
+const createLaser = (src, indexLaser) => {
+    /*
     let indexLaser;
     if (gameObject.arrBulletsPlayers.length == 0) {
         indexLaser = 0;
     } else {
         indexLaser = gameObject.arrBulletsPlayers.length;
     }
-    const el = new Laser(player.positionX + (player.width / 2) - 3, player.positionY - (player.height / 2) - 20);
+    let laserType = 'p';
+   */
     let elDom = document.createElement('img');
     elDom.style.opacity = 0;
-    elDom.src = el.imgSrc;
+    // elDom.src = el.imgSrc;
+    elDom.src = src;
     elDom.id = 'laser-' + indexLaser;
-    el.refId = elDom.id;
+    //el.refId = elDom.id;
     elDom.classList.add('laser-player');
     elDom.style.position = 'absolute';
     elDom.style.transformOrigin = 'center';
@@ -322,23 +626,26 @@ const createLaser = () => {
     elDom.style.top = el.positionY;
     elDom.style.opacity = 1;
     mainScreenById.appendChild(elDom);
-    el.ref = document.getElementById(elDom.id);
+    //el.ref = document.getElementById(elDom.id);
+
     return el;
 };
 
+/*
 const createEnemiesLasers = (enemieShip) => {
-    console.log(enemieShip);
+    //console.log(enemieShip);
     let indexTab;
-    if(gameObject.arrBulletsEnemies.length == 0) {
+    if (gameObject.arrBulletsEnemies.length == 0) {
         indexTab = 0;
     } else {
         indexTab = gameObject.arrBulletsEnemies.length;
     }
-    let laserN = new Laser(enemieShip.positionX + (enemieShip.width/2) -3, enemieShip.positionY + enemieShip.height ) ;
+    let imgSrc = './src/images/laser-green-11.png';
+    let laserN = new Laser(enemieShip.positionX + (enemieShip.width / 2) - 3, enemieShip.positionY + enemieShip.height, 'n', imgSrc);
 
-    let laserId = 'laser-enemie-'+indexTab;
-    let laserNdom = createElementDom('img', laserId );
-    laserNdom.src ='./src/images/laser-green-11.png';
+    let laserId = 'laser-enemie-' + indexTab;
+    let laserNdom = createElementDom('img', laserId);
+    laserNdom.src = laserN.imgSrc
     laserNdom.classList.add('laser-enemie');
     laserNdom.style.position = 'absolute';
     laserNdom.style.transformOrigin = 'center';
@@ -348,76 +655,162 @@ const createEnemiesLasers = (enemieShip) => {
     laserNdom.style.top = laserN.positionY;
     laserNdom.style.left = laserN.positionX;
 
-    console.log('laserDomN X: ', laserNdom.style.left + 'laser X: ', laserN.positionX);
+    //console.log('laserDomN X: ', laserNdom.style.left + 'laser X: ', laserN.positionX);
     mainScreenById.appendChild(laserNdom);
     laserN.ref = document.getElementById(laserNdom.id);
     laserN.refId = laserNdom.id;
-    console.log(laserNdom)
+    //console.log(laserNdom)
     gameObject.arrBulletsEnemies.push(laserN);
+    console.log(gameObject.arrBulletsEnemies)
+    return laserDom;
 }
+*/
+
 
 const ckeckColision = () => {
-    console.log('checkColision');
+    //console.log('checkColision');
     // check laser on ennemie
 
     if (gameObject.arrBulletsPlayers.length != 0 && gameObject.arrEnemies.length != 0) {
         for (let i = 0; i < gameObject.arrBulletsPlayers.length; i++) {
             for (let j = 0; j < gameObject.arrEnemies.length; j++) {
-                console.log('laser Y: ', gameObject.arrBulletsPlayers[i].positionY + 'laser X: ', gameObject.arrBulletsPlayers[i].positionX);
-                console.log('ennemie Y: ', gameObject.arrEnemies[j].positionY + 'ennemie X: ', gameObject.arrEnemies[j].positionX);
+                // console.log('laser Y: ', gameObject.arrBulletsPlayers[i].positionY + 'laser X: ', gameObject.arrBulletsPlayers[i].positionX);
+                // console.log('ennemie Y: ', gameObject.arrEnemies[j].positionY + 'ennemie X: ', gameObject.arrEnemies[j].positionX);
                 if (
                     gameObject.arrBulletsPlayers[i].positionY <= gameObject.arrEnemies[j].positionY + gameObject.arrEnemies[j].height &&
                     gameObject.arrBulletsPlayers[i].positionX >= gameObject.arrEnemies[j].positionX &&
                     gameObject.arrBulletsPlayers[i].positionX <= gameObject.arrEnemies[j].positionX + gameObject.arrEnemies[j].width) {
-
-                    gameObject.score += gameObject.arrEnemies[j].points;
-                    console.log(gameObject.score);
                     
+                  
+                   
+                    //console.log(gameObject.score);
+
 
                     let enemie = gameObject.arrEnemies[j];
-                    let enemieId = gameObject.arrEnemies[j].refId;
+                    let enemieId = gameObject.arrEnemies[j].ref;
+                    if(enemie.isCollised === false) {
+                        gameObject.score += gameObject.arrEnemies[j].points;
+                    }
+                    
                     enemie.isCollised = true;
+                    enemie.destroy();
+                    //gameObject.arrBulletsPlayers[i].isCollised = true;
+                    //gameObject.arrEnemies.splice(j, 1);
 
-                    gameObject.arrEnemies.splice(j, 1);
-                    enemieId.remove();
 
-                    let laser = gameObject.arrBulletsPlayers[i];
-                    let laserId = gameObject.arrBulletsPlayers[i].refId;
-                    let laserRef = gameObject.arrBulletsPlayers[i].ref;
-                    
-                    laserRef.remove();
-                    gameObject.arrBulletsPlayers.splice(i, 1);
-                    
+                    // let laser = gameObject.arrBulletsPlayers[i];
+                    // let laserId = gameObject.arrBulletsPlayers[i].refId;
+                    // let laserRef = gameObject.arrBulletsPlayers[i].ref;
+
+                    //laserRef.remove();
+                    //gameObject.arrBulletsPlayers.splice(i, 1);
+
                 }
             }
+            /*
+            gameObject.arrBulletsPlayers
+            let elmentsToRemove = gameObject.arrBulletsPlayers.filter((bullet) => { bullet.isCollised === true})
+            console.log('#####################',elmentsToRemove);
+            if(elmentsToRemove.length != 0) {
+                console.log('#####################',elmentsToRemove);
+                gameObject.stopLoopGame();
+            }
+            */
+
         }
+
     }
 
-    if(gameObject.arrEnemies.length == 0) {
-        gameObject.stopLoopGame;
-        console.log('------ Level Complite ------')
+    if (gameObject.arrBulletsEnemies.length != 0) {
+        let bulletsToRemove = [];
+        let indexOfEl;
+        for (let d = 0; d < gameObject.arrBulletsEnemies.length; d++) {
+            if (gameObject.arrBulletsEnemies[d].positionY >= (player.positionY - player.height) + (gameObject.arrBulletsEnemies[d].height / 2) &&
+                gameObject.arrBulletsEnemies[d].positionX >= player.positionX &&
+                gameObject.arrBulletsEnemies[d].positionX <= player.positionX + player.width) {
+                // console.log('----------------------------------');
+                // console.log(player.positionX, gameObject.arrBulletsEnemies[d].positionX)
+                // console.log('colision laser enemie width player');
+                // console.log('----------------------------------');
+                //gameObject.arrBulletsEnemies[d].isCollised = true;
+                //gameObject.arrBulletsEnemies[d].ref.style.display = 'none';
+                //gameObject.arrBulletsEnemies[d].ref.classList.add('enemybullet', 'toremove');
+
+                //bulletsToRemove.push(gameObject.arrBulletsEnemies[d])
+                //console.log(indexOfEl = gameObject.arrBulletsEnemies.indexOf(gameObject.arrBulletsEnemies[d]))
+                //indexOfEl = gameObject.arrBulletsEnemies.indexOf(gameObject.arrBulletsEnemies[d]);
+                //bulletsToRemove.push(indexOfEl);
+
+                gameObject.nbrLife -= 1;
+                if (gameObject.nbrLife < 0) {
+                    gameObject.gameIsOver = true;
+                    //console.log(divPanelEnd);
+                    //divPanelEnd.innerHTML = `<h3>GAME OVER !</h3><p>You lose ! You have lost all your life</p><button type="button" class="btn">Try again ?</button>`
+                    //divPanelEnd.classList.add('show');
+                    //gameObject.stopLoopGame();
+
+                }
+
+            }
+
+            //gameObject.stopLoopGame();
+
+        }
+        //console.log('----------------------------------');
+        //console.log(bulletsToRemove);
+        //console.log('----------------------------------');
+
+    }
+
+    if (gameObject.arrEnemies.length == 0) {
+        //gameObject.stopLoopGame;
+        //console.log('------ Level Complite ------')
     }
 };
 
 /************* GAME INIT ***********/
 const gameInit = () => {
     //display header + panels
-    document.getElementById('header').style.display = 'none';
+    let header = document.getElementById('header');
+    header.classList.remove('header-intro');
+    header.classList.add('header-game');
+    header.innerHTML = `<div class="flex-h-between">
+        <div id="zone-player">
+            <h3 class="title-menu">PLAYER: </h3>
+            <p class="text flex-left"><span class="nbr-life">${gameObject.nbrLife}</span> X <img class="img-life" src="./src/images/player-orange-2.png"></p>
+        </div>
+        <div id="zone-time">
+            <h3 class="title-menu">TIME</h3>
+            <p class="text">${gameObject.time}</p>
+        </div>
+        <div id="zone-score">
+            <h3 class="title-menu">SCORE</h3>
+            <p class="text">${gameObject.score}</p>
+        </div></div>`;
     document.getElementById('panels').style.display = 'none';
 
-
+    let endPanel = document.createElement('div');
+    endPanel.id = 'panel-end';
+    endPanel.classList.add('panel')
+    endPanel.innerHTML = 'test end pannel';
 
     const mainScreen = createElementDom('div', 'main-screen');
     createMainScreenGame(mainScreen);
     insertElementInDom(elMain, mainScreen);
-    mainScreenById = document.getElementById('main-screen');
+    mainScreenById = document.getElementById('main-screen')
+    mainScreenById.style.margin = '0 auto';
+
+    mainScreenById.appendChild(endPanel);
+    divPanelEnd = document.getElementById('panel-end');
+
     createPlayer();
     createEnnemies();
+    //console.log('nbrLife: ', gameObject.nbrLife);
     gameObject.startLoopGame();
 };
 
 const listnerKeybord = (evt) => {
-    console.log(evt.keyCode);
+    //console.log(evt.keyCode);
     /* yop:38 bottom: 40,  left: 37, right: 39, spacebar: 32*/
 
     switch (evt.keyCode) {
@@ -445,13 +838,11 @@ const listnerKeybord = (evt) => {
         }
 
         case 32: {
-            const laser = createLaser();
-            gameObject.arrBulletsPlayers.push(laser);
-            console.log(gameObject.arrBulletsPlayers);
+            new Laser(player.positionX + (player.width / 2) - 3, player.positionY - (player.height / 2) - 20, "p").moveToTop();
             break;
         }
     }
-    console.log(player);
+    //console.log(player);
 };
 
 

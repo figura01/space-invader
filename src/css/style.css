@@ -28,12 +28,29 @@ body {
     height: 100%;
 }
 
-header {
+.header-intro {
     text-align: center;
     height: 600px;
     position:relative;
     z-index: 2;
 }
+
+.header-game {
+    position: relative;
+    z-index: 10;
+    background: black;
+    padding: 20px 0;
+}
+
+.img-life {
+    height: 15px;
+    padding-left: 10px;
+}
+
+.text {
+    font-size: 20px;
+}
+
 
 .main-title {
     font-size: 60px;
@@ -42,6 +59,18 @@ header {
 .flex-h-center {
     display: flex;
     justify-content: center;
+    align-items: center;
+}
+.flex-left {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.flex-h-between {
+    display: flex;
+    justify-content: space-between;
+    width: 800px;
     align-items: center;
 }
 
@@ -145,14 +174,46 @@ header {
     display: none;
 }
 
+#panel-end {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -60%);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 100;
+}
+
+#panel-end.show {
+    visibility: visible;
+    animation: 0.4s linear forwards panelin;
+}
+
+@keyframes panelin {
+    0% {
+        opacity: 0;
+        top: 60%;
+        transform: translate(-50%, -60%);
+    }
+
+    100% {
+        opacity: 1;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
 @keyframes slide-in {
     0% {
         opacity: 0;
+        
         transform: translate(-50%, 40px);
     }
 
     100% {
         opacity: 1;
+        
         transform: translate(-50%, 0px);
     }
 }
