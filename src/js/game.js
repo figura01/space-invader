@@ -761,11 +761,9 @@ const ckeckColision = () => {
                     gameObject.resetLoopGame();
 
                 }
-
-            }
+            
 
             //gameObject.stopLoopGame();
-
         }
         //console.log('----------------------------------');
         //console.log(bulletsToRemove);
@@ -827,7 +825,7 @@ const gameInit = () => {
     insertElementInDom(elMain, mainScreen);
     mainScreenById = document.getElementById('main-screen')
     mainScreenById.style.margin = '0 auto';
-    mainScreenById.style.classList.add('anim-bg');
+    mainScreenById.classList.add('anim-bg');
     mainScreenById.appendChild(messagePanel);
     divMessagePanel = document.getElementById('panel-message');
 
