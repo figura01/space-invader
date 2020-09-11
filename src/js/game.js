@@ -823,9 +823,9 @@ const gameInit = () => {
     const mainScreen = createElementDom('div', 'main-screen');
     createMainScreenGame(mainScreen);
     insertElementInDom(elMain, mainScreen);
-    mainScreenById = document.getElementById('main-screen')
+    mainScreenById = document.getElementById('main-screen');
     mainScreenById.style.margin = '0 auto';
-    mainScreenById.classList.add('anim-bg');
+
     mainScreenById.appendChild(messagePanel);
     divMessagePanel = document.getElementById('panel-message');
 
