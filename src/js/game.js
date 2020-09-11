@@ -875,4 +875,4 @@ const listnerKeybord = (evt) => {
 
 window.addEventListener('keydown', listnerKeybord);
 
-gameInit();
+gameInit()
