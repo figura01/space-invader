@@ -1,8 +1,8 @@
 console.log('gamejs');
 
 class Game {
-    constructor(difficulty) {
-        this.level = 1;
+    constructor(difficulty, level = 1) {
+        this.level = level;
         this.difficulty = difficulty;
         this.width = 800;
         this.height = 600;
@@ -113,7 +113,7 @@ class ShipEnemie extends objElGame {
         this.imgSrc = './src/images/enemy-black-1.png';
         this.refId = '';
         this.points = 100;
-        this.index = gameObject.arrEnemies.push(this) -1;
+        this.index = gameObject.arrEnemies.push(this) - 1;
 
         this.isCollised = false;
     }
@@ -150,7 +150,7 @@ class ShipEnemie extends objElGame {
             indexTab = gameObject.arrBulletsEnemies.length;
         }
         let laserN = new Laser(this.positionX + (this.width / 2) - 3, this.positionY + this.height, 'n', this.index);
-        
+
         /*
         let laserId = 'laser-enemie-' + indexTab;
         let laserNdom = createElementDom('img', laserId);
@@ -172,7 +172,7 @@ class ShipEnemie extends objElGame {
         setTimeout(() => {
             this.isBlocked = false;
         }, 500);
-        
+
     }
 
     getPosition() {
@@ -189,16 +189,16 @@ class ShipEnemie extends objElGame {
     destroy() {
         console.log(this);
         //gameObject.arrEnemies.splice(this.index, 1);
-        
-        if(this.isCollised === true){
+
+        if (this.isCollised === true) {
             //this.gameObject.score += this.points; 
             //this.isCollised = true;
-            
+
             //gameObject.arrEnemies.splice(this.index, 1);
             this.ref.remove();
         }
-        
-        
+
+
         //gameObject.stopLoopGame();
     }
 }
@@ -213,7 +213,7 @@ class Laser extends objElGame {
         this.ref = '';
         this.type = type;
         this.isToofar = false;
-        this.index = this.type === 'p' ? 
+        this.index = this.type === 'p' ?
             'player' :
             propLaser;
 
@@ -227,11 +227,11 @@ class Laser extends objElGame {
 
         this.element = this.type === "p" ? this.createElementDomP() : this.createElementDomN();
         //this.element = this.type === "n" ? this.createElementDomN() : null;
-        
+
     }
 
     createElementDomP() {
-        
+
         const elDom = document.createElement('img');
         elDom.style.opacity = 0;
         // elDom.src = el.imgSrc;
@@ -239,7 +239,7 @@ class Laser extends objElGame {
         elDom.id = 'laser-' + this.index;
         //el.refId = elDom.id; 
         elDom.classList.add('laser-player');
-       
+
         elDom.style.position = 'absolute';
         elDom.style.transformOrigin = 'center';
 
@@ -248,13 +248,13 @@ class Laser extends objElGame {
         elDom.style.left = this.positionX;
         elDom.style.top = this.positionY;
         elDom.style.opacity = 1;
-        
+
         return mainScreenById.appendChild(elDom);
-        
+
     }
 
     createElementDomN() {
-        
+
         const elDom = document.createElement('img');
         elDom.style.opacity = 0;
         elDom.src = this.imgSrc;
@@ -283,30 +283,30 @@ class Laser extends objElGame {
         if (this.type == 'n') {
 
 
-            if( 
+            if (
                 this.positionX < player.positionX + player.width &&
                 this.positionX + this.positionX > player.positionX &&
                 this.positionY < player.positionY + player.height &&
                 this.height + this.positionY > player.positionY &&
                 this.isCollised === false
-                
+
                 // this.positionY + (this.height/2) > player.positionY - (player.height/2)
                 // && this.positionY - (this.height/2) < gameObject.height
                 // && this.positionX > player.positionX - (player.width/2)
                 // && this.positionX < player.positionX + (player.width/2)
-            ){
-                
+            ) {
+
                 this.isCollised = true;
                 this.element.remove();
                 gameObject.nbrLife -= 1;
                 console.log(gameObject.nbrLife);
-                if(gameObject.nbrLife < 0) {
-                    divPanelEnd.innerHTML = `<h3>GAME OVER !</h3><p>You lose ! You have lost all your life</p><button id="btn-reload" type="button" class="btn">Try again ?</button>`
+                if (gameObject.nbrLife < 0) {
+                    divPanelMessage.innerHTML = createPanel('lose');
                     const btnReload = document.addEventListener('click', fctReloadPage);
-                    divPanelEnd.classList.add('show');
+                    divPanelMessage.classList.add('show');
                     gameObject.stopLoopGame();
                     gameObject.resetLoopGame();
-                    window.location.reload
+
                     //gameInit();
                 }
             }
@@ -333,30 +333,30 @@ class Laser extends objElGame {
             gameObject.stopLoopGame();
             */
         }
-        requestAnimationFrame(this.checkCollision);   
-        
+        requestAnimationFrame(this.checkCollision);
+
     }
 
     moveToTop() {
         //console.log('in moveTo', this, +' ' + this.type)
-        if(this.positionY < 0 && this.type === 'p') {
+        if (this.positionY < 0 && this.type === 'p') {
             this.element.style.display = 'none';
             this.isToofar = true;
             //this.destroy();
         } else {
-            this.positionY -= 5; 
-           
+            this.positionY -= 5;
+
         }
-        
-        
-        
+
+
+
         //this.checkCollision();
         //gameObject.stopLoopGame();
     }
 
     moveToBottom() {
 
-        if(this.positionY > gameObject.height && this.type === 'n') {
+        if (this.positionY > gameObject.height && this.type === 'n') {
             this.element.style.display = 'none';
             this.isToofar = true;
 
@@ -364,10 +364,10 @@ class Laser extends objElGame {
         } else {
             this.positionY += 5;
         }
-      
+
         this.checkCollision();
-        
-        
+
+
         //this.checkCollision();
         //if ("check pos vs container");
     }
@@ -377,7 +377,7 @@ class Laser extends objElGame {
         if (this.type == 'n') {
             //console.log(this.index);
             //gameObject.arrBulletsEnemies.splice(this.index, 1);
-            
+
             // delete du doc    
 
         } else {
@@ -393,19 +393,19 @@ class Laser extends objElGame {
     render() {
         //console.log(this.ref);
 
-        
-        if(this.type == 'p') {
+
+        if (this.type == 'p') {
 
             this.element.style.top = this.positionY;
             //gameObject.stopLoopGame();
         } else {
 
             this.element.style.top = this.positionY;
-            
+
             //gameObject.stopLoopGame();
         }
-       
-        
+
+
     }
 }
 
@@ -416,7 +416,8 @@ var gameObject = new Game('easy');
 //console.log(gameObject);
 
 var mainScreenById;
-var divPanelEnd;
+var divMessagePanel;
+var btnReload;
 
 var player = new ShipPlayer((gameObject.width / 2), (gameObject.height - 50), 40, 30);
 
@@ -487,10 +488,10 @@ const renderElements = () => {
 
         //console.log(gameObject.arrBulletsPlayers);
         for (let i = 0; i < gameObject.arrBulletsPlayers.length; i++) {
-            
-                gameObject.arrBulletsPlayers[i].moveToTop();
-                gameObject.arrBulletsPlayers[i].render();
-            
+
+            gameObject.arrBulletsPlayers[i].moveToTop();
+            gameObject.arrBulletsPlayers[i].render();
+
             /*
             lasers[i].style.top = gameObject.arrBulletsPlayers[i].positionY;
             //console.log(gameObject.arrBulletsPlayers[i].positionY);
@@ -510,11 +511,11 @@ const renderElements = () => {
 
         for (let j = 0; j < gameObject.arrBulletsEnemies.length; j++) {
             //console.log(gameObject.arrBulletsEnemies[j]);
-            
+
             gameObject.arrBulletsEnemies[j].moveToBottom();
             gameObject.arrBulletsEnemies[j].render();
-            
-            
+
+
             /*
             lasersN[j].style.top = gameObject.arrBulletsEnemies[j].positionY;
             if (gameObject.arrBulletsEnemies[j].positionY > gameObject.height + (gameObject.arrBulletsEnemies[j].height)) {
@@ -680,24 +681,30 @@ const ckeckColision = () => {
                     gameObject.arrBulletsPlayers[i].positionY <= gameObject.arrEnemies[j].positionY + gameObject.arrEnemies[j].height &&
                     gameObject.arrBulletsPlayers[i].positionX >= gameObject.arrEnemies[j].positionX &&
                     gameObject.arrBulletsPlayers[i].positionX <= gameObject.arrEnemies[j].positionX + gameObject.arrEnemies[j].width) {
-                    
-                  
-                   
+
+
+
                     //console.log(gameObject.score);
 
 
                     let enemie = gameObject.arrEnemies[j];
                     let enemieId = gameObject.arrEnemies[j].ref;
-                    if(enemie.isCollised === false) {
+                    if (enemie.isCollised === false) {
                         gameObject.score += gameObject.arrEnemies[j].points;
                     }
-                    
+
                     enemie.isCollised = true;
                     enemie.destroy();
-                    //gameObject.arrBulletsPlayers[i].isCollised = true;
-                    //gameObject.arrEnemies.splice(j, 1);
+                    gameObject.arrBulletsPlayers[i].isCollised = true;
+                    gameObject.arrEnemies.splice(j, 1);
 
-
+                    if (gameObject.arrEnemies.length == 0) {
+                        gameObject.gameIsOver = true;
+                        divMessagePanel.innerHTML = createMessagePanel('victory');
+                        divMessagePanel.classList.add('show');
+                        gameObject.stopLoopGame();
+                        gameObject.resetLoopGame();
+                    }
                     // let laser = gameObject.arrBulletsPlayers[i];
                     // let laserId = gameObject.arrBulletsPlayers[i].refId;
                     // let laserRef = gameObject.arrBulletsPlayers[i].ref;
@@ -744,10 +751,14 @@ const ckeckColision = () => {
                 gameObject.nbrLife -= 1;
                 if (gameObject.nbrLife < 0) {
                     gameObject.gameIsOver = true;
-                    //console.log(divPanelEnd);
-                    //divPanelEnd.innerHTML = `<h3>GAME OVER !</h3><p>You lose ! You have lost all your life</p><button type="button" class="btn">Try again ?</button>`
-                    //divPanelEnd.classList.add('show');
-                    //gameObject.stopLoopGame();
+                    //console.log(divMessagePanel);
+                    divMessagePanel.innerHTML = createMessagePanel('lose');
+                    
+                    divMessagePanel.classList.add('show');
+                    btnReload = document.getElementById('btn-reload');
+                    btnReload.addEventListener('click', fctRealodPage)
+                    gameObject.stopLoopGame();
+                    gameObject.resetLoopGame();
 
                 }
 
@@ -767,6 +778,23 @@ const ckeckColision = () => {
         //console.log('------ Level Complite ------')
     }
 };
+
+const fctRealodPage = (evt) => {
+    evt.preventDefault();
+    window.location.reload();
+}
+
+const createMessagePanel = (type) => {
+    var el;
+
+    if (type == 'lose') {
+        el = `<h3>GAME OVER !</h3><p>You lose ! You have lost all your life</p><button id="btn-reload" type="button" class="btn">Try again ?</button>`;
+    } else {
+        el = `<h3>VICTORY !</h3><p>You won ! You have killed all aliens bfore they destroy the earth</p><button id="btn-next" type="button" class="btn">Go next level</button>`;
+    }
+
+    return el;
+}
 
 /************* GAME INIT ***********/
 const gameInit = () => {
@@ -789,19 +817,19 @@ const gameInit = () => {
         </div></div>`;
     document.getElementById('panels').style.display = 'none';
 
-    let endPanel = document.createElement('div');
-    endPanel.id = 'panel-end';
-    endPanel.classList.add('panel')
-    endPanel.innerHTML = 'test end pannel';
+    let messagePanel = document.createElement('div');
+    messagePanel.id = 'panel-message';
+    messagePanel.classList.add('panel')
+    messagePanel.innerHTML = '';
 
     const mainScreen = createElementDom('div', 'main-screen');
     createMainScreenGame(mainScreen);
     insertElementInDom(elMain, mainScreen);
     mainScreenById = document.getElementById('main-screen')
     mainScreenById.style.margin = '0 auto';
-
-    mainScreenById.appendChild(endPanel);
-    divPanelEnd = document.getElementById('panel-end');
+    mainScreenById.style.classList.add('anim-bg');
+    mainScreenById.appendChild(messagePanel);
+    divMessagePanel = document.getElementById('panel-message');
 
     createPlayer();
     createEnnemies();

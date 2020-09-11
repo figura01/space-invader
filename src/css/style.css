@@ -174,7 +174,7 @@ body {
     display: none;
 }
 
-#panel-end {
+#panel-message {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -185,7 +185,7 @@ body {
     z-index: 100;
 }
 
-#panel-end.show {
+#panel-message.show {
     visibility: visible;
     animation: 0.4s linear forwards panelin;
 }
